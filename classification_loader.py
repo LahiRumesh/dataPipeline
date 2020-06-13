@@ -4,9 +4,9 @@ import numpy as np
 from tqdm import tqdm
 import cv2
 import argparse
+import matplotlib.pyplot as plt
 
-
-REBUILD_DATA=True 
+REBUILD_DATA=False 
 
 parser=argparse.ArgumentParser()
 parser.add_argument("--Data_Folder", type=str, default="Data", help="Training Images folder")
@@ -16,6 +16,9 @@ args = parser.parse_args()
 
 classes=os.listdir(args.Data_Folder)
 full_path=list(os.path.join(args.Data_Folder,i) for i in classes)
+with open('classes.txt', 'w') as f:
+    for data in classes:
+        f.write("%s\n" % data)
 
 class Classification_Data():
 
@@ -47,7 +50,7 @@ training_data=np.load("training_data.npy",allow_pickle=True)
 
 
 
-import matplotlib.pyplot as plt
+
 
 plt.imshow(training_data[3][0])
 plt.show()
