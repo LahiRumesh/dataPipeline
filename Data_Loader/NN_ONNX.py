@@ -16,8 +16,8 @@ REBUILD_DATA=False#rearrange training and testing numpy data sets
 SAVE_DATA=True
 
 parser=argparse.ArgumentParser()
-parser.add_argument("--Data_Folder", type=str, default="../Data/Small_data", help="Training Images folder")
-parser.add_argument("--IMAGE_SIZE", type=str, default=100, help="Image Size")
+parser.add_argument("--Data_Folder", type=str, default="../Data/pre_trained", help="Training Images folder")
+parser.add_argument("--IMAGE_SIZE", type=str, default=224, help="Image Size")
 parser.add_argument("--TEST_SIZE", type=float, default=0.1, help="Testing data percentage")
 args = parser.parse_args()
 
@@ -49,8 +49,8 @@ class Classification_Data():
         test_size=int(len(self.data_list)*args.TEST_SIZE)
         training_data,testing_data=self.data_list[test_size:],self.data_list[:test_size]
         if SAVE_DATA:
-            np.save("training_data1.npy",training_data) #Save training data to numpy array
-            np.save("testing_data2.npy",testing_data) #Save testing data to numpy array
+            np.save("training_data3.npy",training_data) #Save training data to numpy array
+            np.save("testing_data3.npy",testing_data) #Save testing data to numpy array
 
         
         return training_data,testing_data
@@ -77,7 +77,7 @@ class Classification_DATASET(Dataset):
 
     def __getitem__(self,idx):
         data = self.data_set[idx][0]
-        data=data.astype(np.float32).reshape(3,100,100)
+        data=data.astype(np.float32).reshape(3,224,224)
 
         if self.transform:
             data=self.transform(data)
@@ -95,13 +95,13 @@ data_transform = transforms.Compose([
 train_data = Classification_DATASET(training_data)
 test_data = Classification_DATASET(testing_data)
 
-train_loader = DataLoader(train_data, batch_size=2, shuffle=False)
-test_loader = DataLoader(test_data, batch_size=2, shuffle=True)
+train_loader = DataLoader(train_data, batch_size=4, shuffle=False)
+test_loader = DataLoader(test_data, batch_size=4, shuffle=True)
 
 #define NN
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-model_ft = models.resnet18(pretrained=True)
+model_ft = models.resnet50(pretrained=True)
 num_ftrs = model_ft.fc.in_features
 model_ft.fc = nn.Linear(num_ftrs, len(classes))
 
@@ -150,8 +150,8 @@ with torch.no_grad():
     print('Test Accuracy of the model on the 10000 test images: {} %'.format(2 * correct / total))
 
 # Save the model checkpoint
-input_shape = (3, 100, 100)
-model_onnx_path = "torch_model.onnx"
+input_shape = (3, 224, 224)
+model_onnx_path = "test_model.onnx"
 #model = Model()
 #model.train(False)
 
